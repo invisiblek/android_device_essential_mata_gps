@@ -496,7 +496,7 @@ static void local_gnss_sv_status_callback(LocGnssSvStatus* sv_info)
         GnssSvStatus* p_info = NULL;
         if (NULL != sv_info) {
             Q2A_GnssSvStatus(*sv_info, info);
-            p_info - &info;
+            p_info = &info;
         }
         pGpsCallbacks->gnss_sv_status_cb(p_info);
     }
