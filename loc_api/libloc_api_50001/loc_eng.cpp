@@ -54,7 +54,7 @@
 #include <loc_eng_dmn_conn.h>
 #include <loc_eng_dmn_conn_handler.h>
 #include <loc_eng_msg.h>
-#include <loc_eng_nmea.h>
+#include <loc_nmea.h>
 #include <msg_q.h>
 #include <loc.h>
 #include <platform_lib_includes.h>
@@ -832,10 +832,17 @@ void LocEngReportPosition::proc() const {
         if (locEng->generateNmea &&
             locEng->adapter->isInSession())
         {
+            std::vector<std::string> nmeaArraystr;
             unsigned char generate_nmea = reported &&
                                           (mStatus != LOC_SESS_FAILURE);
-            loc_eng_nmea_generate_pos(locEng, mLocation, mLocationExtended,
-                                      generate_nmea);
+            loc_nmea_generate_pos(mLocation, mLocationExtended, generate_nmea, nmeaArraystr);
+            struct timeval tv;
+            gettimeofday(&tv,  NULL);
+            int64_t now = tv.tv_sec * 1000LL + tv.tv_usec / 1000;
+            for(int i = 0; i < nmeaArraystr.size(); i++) {
+                if (locEng->nmea_cb != NULL)
+                   locEng->nmea_cb(now, nmeaArraystr[i].c_str(), nmeaArraystr[i].length());
+            }
         }
 
         // Free the allocated memory for rawData
@@ -928,7 +935,17 @@ void LocEngReportSv::proc() const {
 
         if (locEng->generateNmea)
         {
-            loc_eng_nmea_generate_sv(locEng, gnssSvStatus, mLocationExtended);
+            std::vector<std::string> nmeaArraystr;
+            loc_nmea_generate_sv(gnssSvStatus, mLocationExtended, nmeaArraystr);
+            struct timeval tv;
+            gettimeofday(&tv,  NULL);
+            int64_t now = tv.tv_sec * 1000LL + tv.tv_usec / 1000;
+            for(int i = 0; i < nmeaArraystr.size(); i++) {
+                if (locEng->nmea_cb != NULL)
+                   locEng->nmea_cb(now, nmeaArraystr[i].c_str(), nmeaArraystr[i].length());
+
+            }
+
         }
     }
 }

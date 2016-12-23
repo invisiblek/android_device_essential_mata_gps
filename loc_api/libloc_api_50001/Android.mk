@@ -26,7 +26,6 @@ LOCAL_SRC_FILES += \
     loc_eng_xtra.cpp \
     loc_eng_ni.cpp \
     loc_eng_log.cpp \
-    loc_eng_nmea.cpp \
     LocEngAdapter.cpp
 
 LOCAL_SRC_FILES += \
