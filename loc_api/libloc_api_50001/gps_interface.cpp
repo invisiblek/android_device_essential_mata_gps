@@ -551,7 +551,6 @@ static void loc_cleanup()
     if (NULL != pLocGpsInterface && NULL != pLocGpsInterface->cleanup) {
         pLocGpsInterface->cleanup();
     }
-    pGpsCallbacks = NULL;
     EXIT_LOG(%s, VOID_RET);
 }
 
