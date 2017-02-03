@@ -64,14 +64,6 @@
 #define SUCCESS TRUE
 #define FAILURE FALSE
 
-#ifndef GPS_CONF_FILE
-#define GPS_CONF_FILE            "/etc/gps.conf"   //??? platform independent
-#endif
-
-#ifndef SAP_CONF_FILE
-#define SAP_CONF_FILE            "/etc/sap.conf"
-#endif
-
 #define XTRA1_GPSONEXTRA         "xtra1.gpsonextra.net"
 
 using namespace loc_core;
@@ -3047,8 +3039,8 @@ int loc_eng_read_config(void)
       loc_default_parameters();
       // We only want to parse the conf file once. This is a good place to ensure that.
       // In fact one day the conf file should go into context.
-      UTIL_READ_CONF(GPS_CONF_FILE, gps_conf_table);
-      UTIL_READ_CONF(SAP_CONF_FILE, sap_conf_table);
+      UTIL_READ_CONF(LOC_PATH_GPS_CONF, gps_conf_table);
+      UTIL_READ_CONF(LOC_PATH_SAP_CONF, sap_conf_table);
       configAlreadyRead = true;
     } else {
       LOC_LOGV("GPS Config file has already been read\n");
