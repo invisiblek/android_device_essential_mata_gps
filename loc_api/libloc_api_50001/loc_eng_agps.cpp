@@ -760,8 +760,13 @@ int AgpsStateMachine::sendRsrcRequest(LocAGpsStatusValue action) const
         nifRequest.status = action;
 
         if (s == NULL) {
+            // Release agps data connection
             nifRequest.ipv4_addr = INADDR_NONE;
             memset(&nifRequest.addr, 0,  sizeof(nifRequest.addr));
+            // Fill up socket address info so that framework will not skip.
+            struct sockaddr_in *in = (struct sockaddr_in*)&(nifRequest.addr);
+            in->sin_addr.s_addr = INADDR_NONE;
+            in->sin_family = AF_INET;
             nifRequest.ssid[0] = '\0';
             nifRequest.password[0] = '\0';
         } else {
