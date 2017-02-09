@@ -17,7 +17,7 @@ libloc_adapter_so_la_CFLAGS = $(AM_CFLAGS)
 libloc_adapter_so_la_LDFLAGS = -Wl,-z,defs -lpthread -shared -version-info 1:0:0
 libloc_adapter_so_la_CPPFLAGS = $(AM_CFLAGS) $(AM_CPPFLAGS)
 endif
-libloc_adapter_so_la_LIBADD = -lstdc++ -lcutils ../../utils/libgps_utils_so.la
+libloc_adapter_so_la_LIBADD = -lstdc++ -lcutils $(GPSUTILS_LIBS)
 
 
 libloc_eng_so_la_SOURCES = \
@@ -44,7 +44,7 @@ libloc_eng_so_la_LDFLAGS = -Wl,-z,defs -lpthread -shared -version-info 1:0:0
 libloc_eng_so_la_CPPFLAGS = $(AM_CFLAGS) $(AM_CPPFLAGS)
 endif
 
-libloc_eng_so_la_LIBADD = -lstdc++ -lcutils -ldl ../../utils/libgps_utils_so.la libloc_adapter_so.la
+libloc_eng_so_la_LIBADD = -lstdc++ -lcutils -ldl $(GPSUTILS_LIBS) libloc_adapter_so.la
 
 library_include_HEADERS = \
    LocEngAdapter.h \

@@ -4,6 +4,7 @@ AM_CFLAGS = \
      -I./libloc_api_50001 \
      -I../utils \
      $(LOCPLA_CFLAGS) \
+     $(GPSUTILS_CFLAGS) \
      -fno-short-enums \
      -D__func__=__PRETTY_FUNCTION__ \
      -DTARGET_USES_QCOM_BSP \
@@ -26,7 +27,6 @@ libloc_eng_so_la_SOURCES = \
     libloc_api_50001/loc_eng_xtra.cpp \
     libloc_api_50001/loc_eng_ni.cpp \
     libloc_api_50001/loc_eng_log.cpp \
-    libloc_api_50001/loc_eng_nmea.cpp \
     libloc_api_50001/LocEngAdapter.cpp \
     libloc_api_50001/loc_eng_dmn_conn.cpp \
     libloc_api_50001/loc_eng_dmn_conn_handler.cpp \
@@ -46,7 +46,7 @@ libloc_eng_so_la_LDFLAGS = -Wl,-z,defs -lpthread -shared -version-info 1:0:0
 libloc_eng_so_la_CPPFLAGS = $(AM_CFLAGS) $(AM_CPPFLAGS)
 endif
 
-libloc_eng_so_la_LIBADD = -lstdc++ -ldl -llog $(LOCPLA_LIBS) ../utils/libgps_utils_so.la ../core/libloc_core.la
+libloc_eng_so_la_LIBADD = -lstdc++ -ldl -llog $(LOCPLA_LIBS) $(GPSUTILS_LIBS) ../core/libloc_core.la
 
 libloc_ds_api_CFLAGS = \
      $(QMIF_CFLAGS) \
@@ -69,8 +69,7 @@ libloc_ds_api_la_LDFLAGS += -Wl,--export-dynamic
 libloc_ds_api_la_CPPFLAGS = $(AM_CFLAGS) $(AM_CPPFLAGS) $(libloc_ds_api_CFLAGS)
 endif
 
-libloc_ds_api_la_LIBADD = -lstdc++ $(QMIF_LIBS) -lqmiservices -ldsi_netctrl $(LOCPLA_LIBS) ../utils/libgps_utils_so.la
-#libloc_ds_api_la_LIBADD = -lstdc++ $(QMIF_LIBS) -lqmiservices $(LOCPLA_LIBS) ../utils/libgps_utils_so.la
+libloc_ds_api_la_LIBADD = -lstdc++ $(QMIF_LIBS) -lqmiservices -ldsi_netctrl $(GPSUTILS_LIBS) $(LOCPLA_LIBS)
 
 libloc_api_v02_CFLAGS = \
      $(QMIF_CFLAGS) \
@@ -95,7 +94,7 @@ libloc_api_v02_la_CPPFLAGS = $(AM_CFLAGS) $(AM_CPPFLAGS) $(libloc_api_v02_CFLAGS
 endif
 
 libloc_api_v02_la_CXXFLAGS = -std=c++0x
-libloc_api_v02_la_LIBADD = -lstdc++ -lqmi_cci -lqmi_common_so $(QMIF_LIBS) $(LOCPLA_LIBS) ../core/libloc_core.la ../utils/libgps_utils_so.la libloc_ds_api.la
+libloc_api_v02_la_LIBADD = -lstdc++ -lqmi_cci -lqmi_common_so $(QMIF_LIBS) $(LOCPLA_LIBS) ../core/libloc_core.la $(GPSUTILS_LIBS) libloc_ds_api.la
 
 library_include_HEADERS = \
    libloc_api_50001/LocEngAdapter.h \
