@@ -14,14 +14,16 @@ libloc_core_la_h_sources = \
            LBSProxyBase.h \
            UlpProxyBase.h \
            loc_core_log.h \
-           LocAdapterProxyBase.h
+           LocAdapterProxyBase.h \
+           SystemStatus.h
 
 libloc_core_la_c_sources = \
            LocApiBase.cpp \
            LocAdapterBase.cpp \
            ContextBase.cpp \
            LocDualContext.cpp \
-           loc_core_log.cpp
+           loc_core_log.cpp \
+           SystemStatus.cpp
 
 library_includedir = $(pkgincludedir)/core
 
