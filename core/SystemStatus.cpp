@@ -1268,7 +1268,7 @@ bool SystemStatus::setNmeaString(const char *data, uint32_t len)
     }
 
     char buf[SystemStatusNmeaBase::NMEA_MAXSIZE + 1] = { 0 };
-    strncpy(buf, data, len);
+    strlcpy(buf, data, len);
     LOC_LOGI("setNmeaString-0301a: len=%d str=%d nmea=%s", len, strlen(data), buf);
 
     pthread_mutex_lock(&mMutexSystemStatus);
