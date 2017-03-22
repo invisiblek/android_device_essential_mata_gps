@@ -46,7 +46,6 @@ class SystemStatusNmeaBase
 {
 protected:
     std::vector<std::string> mField;
-    timespec setUtcTime(std::string sutctime);
 
 public:
     static const uint32_t NMEA_MINSIZE = 6;
@@ -85,31 +84,12 @@ public:
     virtual ~SystemStatusNmeaBase() { }
 };
 
-timespec SystemStatusNmeaBase::setUtcTime(std::string sutctime)
-{
-    timespec ts = { 0ULL, 0ULL };
-    uint64_t utctime_ns = atof(sutctime.c_str()) * 1000000000ULL;
-    ts.tv_nsec = utctime_ns % 1000000000ULL;
-    uint64_t utctime_s = utctime_ns / 1000000000ULL;
-
-    uint64_t hour = utctime_s / 10000ULL;
-    uint64_t min =  (utctime_s / 100LL) % 100ULL;
-    uint64_t sec =  utctime_s % 100ULL;
-    ts.tv_sec = hour * 3600ULL + min * 60ULL + sec;
-
-    timeval tv;
-    gettimeofday(&tv, NULL);
-    ts.tv_sec += (uint64_t(tv.tv_sec / (24ULL * 60ULL * 60ULL))) * (24ULL * 60ULL * 60ULL);
-    return ts;
-}
-
 /******************************************************************************
  SystemStatusPQWM1
 ******************************************************************************/
 class SystemStatusPQWM1
 {
 public:
-    timespec mUtcTime;
     uint16_t mGpsWeek;    // x1
     uint32_t mGpsTowMs;   // x2
     uint8_t  mTimeValid;  // x3
@@ -186,11 +166,6 @@ public:
             return;
         }
         memset(&mM1, 0, sizeof(mM1));
-
-        timeval tv;
-        gettimeofday(&tv, NULL);
-        mM1.mUtcTime.tv_sec = tv.tv_sec;
-        mM1.mUtcTime.tv_nsec = tv.tv_usec * 1000UL;
         mM1.mGpsWeek = atoi(mField[eGpsWeek].c_str());
         mM1.mGpsTowMs = atoi(mField[eGpsTowMs].c_str());
         mM1.mTimeValid = atoi(mField[eTimeValid].c_str());
@@ -220,7 +195,6 @@ public:
 class SystemStatusPQWP1
 {
 public:
-    timespec mUtcTime;
     uint8_t  mEpiValidity; // x4
     float    mEpiLat;    // x5
     float    mEpiLon;    // x6
@@ -249,7 +223,6 @@ private:
     SystemStatusPQWP1 mP1;
 
 public:
-    inline timespec   getUtcTime() { return mP1.mUtcTime;           }
     inline uint8_t    getEpiValidity() { return mP1.mEpiValidity;      }
     inline float      getEpiLat() { return mP1.mEpiLat;           }
     inline float      getEpiLon() { return mP1.mEpiLon;           }
@@ -265,7 +238,6 @@ public:
             return;
         }
         memset(&mP1, 0, sizeof(mP1));
-        mP1.mUtcTime = setUtcTime(mField[eUtcTime]);
         mP1.mEpiValidity = strtol(mField[eEpiValidity].c_str(), NULL, 16);
         mP1.mEpiLat = atof(mField[eEpiLat].c_str());
         mP1.mEpiLon = atof(mField[eEpiLon].c_str());
@@ -284,7 +256,6 @@ public:
 class SystemStatusPQWP2
 {
 public:
-    timespec mUtcTime;
     float    mBestLat;   // x4
     float    mBestLon;   // x5
     float    mBestAlt;   // x6
@@ -322,7 +293,6 @@ public:
             return;
         }
         memset(&mP2, 0, sizeof(mP2));
-        mP2.mUtcTime = setUtcTime(mField[eUtcTime]);
         mP2.mBestLat = atof(mField[eBestLat].c_str());
         mP2.mBestLon = atof(mField[eBestLon].c_str());
         mP2.mBestAlt = atof(mField[eBestAlt].c_str());
@@ -339,7 +309,6 @@ public:
 class SystemStatusPQWP3
 {
 public:
-    timespec  mUtcTime;
     uint8_t   mXtraValidMask;
     uint32_t  mGpsXtraAge;
     uint32_t  mGloXtraAge;
@@ -395,7 +364,6 @@ public:
             return;
         }
         memset(&mP3, 0, sizeof(mP3));
-        mP3.mUtcTime = setUtcTime(mField[eUtcTime]);
         mP3.mXtraValidMask = strtol(mField[eXtraValidMask].c_str(), NULL, 16);
         mP3.mGpsXtraAge = atoi(mField[eGpsXtraAge].c_str());
         mP3.mGloXtraAge = atoi(mField[eGloXtraAge].c_str());
@@ -418,7 +386,6 @@ public:
 class SystemStatusPQWP4
 {
 public:
-    timespec  mUtcTime;
     uint32_t  mGpsEpheValid;
     uint32_t  mGloEpheValid;
     uint64_t  mBdsEpheValid;
@@ -456,7 +423,6 @@ public:
             return;
         }
         memset(&mP4, 0, sizeof(mP4));
-        mP4.mUtcTime = setUtcTime(mField[eUtcTime]);
         mP4.mGpsEpheValid = strtol(mField[eGpsEpheValid].c_str(), NULL, 16);
         mP4.mGloEpheValid = strtol(mField[eGloEpheValid].c_str(), NULL, 16);
         mP4.mBdsEpheValid = strtol(mField[eBdsEpheValid].c_str(), NULL, 16);
@@ -473,7 +439,6 @@ public:
 class SystemStatusPQWP5
 {
 public:
-    timespec  mUtcTime;
     uint32_t  mGpsUnknownMask;
     uint32_t  mGloUnknownMask;
     uint64_t  mBdsUnknownMask;
@@ -541,7 +506,6 @@ public:
             return;
         }
         memset(&mP5, 0, sizeof(mP5));
-        mP5.mUtcTime = setUtcTime(mField[eUtcTime]);
         mP5.mGpsUnknownMask = strtol(mField[eGpsUnknownMask].c_str(), NULL, 16);
         mP5.mGloUnknownMask = strtol(mField[eGloUnknownMask].c_str(), NULL, 16);
         mP5.mBdsUnknownMask = strtol(mField[eBdsUnknownMask].c_str(), NULL, 16);
@@ -568,7 +532,6 @@ public:
 class SystemStatusPQWP6
 {
 public:
-    timespec  mUtcTime;
     uint32_t  mFixInfoMask;
 };
 
@@ -594,7 +557,6 @@ public:
             return;
         }
         memset(&mP6, 0, sizeof(mP6));
-        mP6.mUtcTime = setUtcTime(mField[eUtcTime]);
         mP6.mFixInfoMask = strtol(mField[eFixInfoMask].c_str(), NULL, 16);
     }
 
@@ -607,7 +569,6 @@ public:
 class SystemStatusPQWS1
 {
 public:
-    timespec  mUtcTime;
     uint32_t  mFixInfoMask;
     uint32_t  mHepeLimit;
 };
@@ -636,7 +597,6 @@ public:
             return;
         }
         memset(&mS1, 0, sizeof(mS1));
-        mS1.mUtcTime = setUtcTime(mField[eUtcTime]);
         mS1.mFixInfoMask = atoi(mField[eFixInfoMask].c_str());
         mS1.mHepeLimit = atoi(mField[eHepeLimit].c_str());
     }
@@ -648,7 +608,6 @@ public:
  SystemStatusTimeAndClock
 ******************************************************************************/
 SystemStatusTimeAndClock::SystemStatusTimeAndClock(const SystemStatusPQWM1& nmea) :
-    SystemStatusItemBase(nmea.mUtcTime),
     mGpsWeek(nmea.mGpsWeek),
     mGpsTowMs(nmea.mGpsTowMs),
     mTimeValid(nmea.mTimeValid),
@@ -691,7 +650,6 @@ void SystemStatusTimeAndClock::dump()
  SystemStatusXoState
 ******************************************************************************/
 SystemStatusXoState::SystemStatusXoState(const SystemStatusPQWM1& nmea) :
-    SystemStatusItemBase(nmea.mUtcTime),
     mXoState(nmea.mXoState)
 {
 }
@@ -716,7 +674,6 @@ void SystemStatusXoState::dump()
  SystemStatusRfAndParams
 ******************************************************************************/
 SystemStatusRfAndParams::SystemStatusRfAndParams(const SystemStatusPQWM1& nmea) :
-    SystemStatusItemBase(nmea.mUtcTime),
     mPgaGain(nmea.mPgaGain),
     mGpsBpAmpI(nmea.mGpsBpAmpI),
     mGpsBpAmpQ(nmea.mGpsBpAmpQ),
@@ -765,7 +722,6 @@ void SystemStatusRfAndParams::dump()
  SystemStatusErrRecovery
 ******************************************************************************/
 SystemStatusErrRecovery::SystemStatusErrRecovery(const SystemStatusPQWM1& nmea) :
-    SystemStatusItemBase(nmea.mUtcTime),
     mRecErrorRecovery(nmea.mRecErrorRecovery)
 {
 }
@@ -790,7 +746,6 @@ void SystemStatusErrRecovery::dump()
  SystemStatusInjectedPosition
 ******************************************************************************/
 SystemStatusInjectedPosition::SystemStatusInjectedPosition(const SystemStatusPQWP1& nmea) :
-    SystemStatusItemBase(nmea.mUtcTime),
     mEpiValidity(nmea.mEpiValidity),
     mEpiLat(nmea.mEpiLat),
     mEpiLon(nmea.mEpiLon),
@@ -833,7 +788,6 @@ void SystemStatusInjectedPosition::dump()
  SystemStatusBestPosition
 ******************************************************************************/
 SystemStatusBestPosition::SystemStatusBestPosition(const SystemStatusPQWP2& nmea) :
-    SystemStatusItemBase(nmea.mUtcTime),
     mBestLat(nmea.mBestLat),
     mBestLon(nmea.mBestLon),
     mBestAlt(nmea.mBestAlt),
@@ -870,7 +824,6 @@ void SystemStatusBestPosition::dump()
  SystemStatusXtra
 ******************************************************************************/
 SystemStatusXtra::SystemStatusXtra(const SystemStatusPQWP3& nmea) :
-    SystemStatusItemBase(nmea.mUtcTime),
     mXtraValidMask(nmea.mXtraValidMask),
     mGpsXtraAge(nmea.mGpsXtraAge),
     mGloXtraAge(nmea.mGloXtraAge),
@@ -925,7 +878,6 @@ void SystemStatusXtra::dump()
  SystemStatusEphemeris
 ******************************************************************************/
 SystemStatusEphemeris::SystemStatusEphemeris(const SystemStatusPQWP4& nmea) :
-    SystemStatusItemBase(nmea.mUtcTime),
     mGpsEpheValid(nmea.mGpsEpheValid),
     mGloEpheValid(nmea.mGloEpheValid),
     mBdsEpheValid(nmea.mBdsEpheValid),
@@ -962,7 +914,6 @@ void SystemStatusEphemeris::dump()
  SystemStatusSvHealth
 ******************************************************************************/
 SystemStatusSvHealth::SystemStatusSvHealth(const SystemStatusPQWP5& nmea) :
-    SystemStatusItemBase(nmea.mUtcTime),
     mGpsUnknownMask(nmea.mGpsUnknownMask),
     mGloUnknownMask(nmea.mGloUnknownMask),
     mBdsUnknownMask(nmea.mBdsUnknownMask),
@@ -1029,7 +980,6 @@ void SystemStatusSvHealth::dump()
  SystemStatusPdr
 ******************************************************************************/
 SystemStatusPdr::SystemStatusPdr(const SystemStatusPQWP6& nmea) :
-    SystemStatusItemBase(nmea.mUtcTime),
     mFixInfoMask(nmea.mFixInfoMask)
 {
 }
@@ -1054,7 +1004,6 @@ void SystemStatusPdr::dump()
  SystemStatusPositionFailure
 ******************************************************************************/
 SystemStatusPositionFailure::SystemStatusPositionFailure(const SystemStatusPQWS1& nmea) :
-    SystemStatusItemBase(nmea.mUtcTime),
     mFixInfoMask(nmea.mFixInfoMask),
     mHepeLimit(nmea.mHepeLimit)
 {
@@ -1105,7 +1054,9 @@ SystemStatus::SystemStatus()
 bool SystemStatus::setTimeAndCLock(const SystemStatusPQWM1& nmea)
 {
     SystemStatusTimeAndClock s(nmea);
-    if (mCache.mTimeAndClock.empty() || !mCache.mTimeAndClock.back().equals(s)) {
+    if (!mCache.mTimeAndClock.empty() && mCache.mTimeAndClock.back().equals(s)) {
+        mCache.mTimeAndClock.back().mUtcReported = s.mUtcReported;
+    } else {
         mCache.mTimeAndClock.push_back(s);
         if (mCache.mTimeAndClock.size() > maxTimeAndClock) {
             mCache.mTimeAndClock.erase(mCache.mTimeAndClock.begin());
@@ -1117,7 +1068,9 @@ bool SystemStatus::setTimeAndCLock(const SystemStatusPQWM1& nmea)
 bool SystemStatus::setXoState(const SystemStatusPQWM1& nmea)
 {
     SystemStatusXoState s(nmea);
-    if (mCache.mXoState.empty() || !mCache.mXoState.back().equals(s)) {
+    if (!mCache.mXoState.empty() && mCache.mXoState.back().equals(s)) {
+        mCache.mXoState.back().mUtcReported = s.mUtcReported;
+    } else {
         mCache.mXoState.push_back(s);
         if (mCache.mXoState.size() > maxXoState) {
             mCache.mXoState.erase(mCache.mXoState.begin());
@@ -1129,7 +1082,9 @@ bool SystemStatus::setXoState(const SystemStatusPQWM1& nmea)
 bool SystemStatus::setRfAndParams(const SystemStatusPQWM1& nmea)
 {
     SystemStatusRfAndParams s(nmea);
-    if (mCache.mRfAndParams.empty() || !mCache.mRfAndParams.back().equals(s)) {
+    if (!mCache.mRfAndParams.empty() && mCache.mRfAndParams.back().equals(s)) {
+        mCache.mRfAndParams.back().mUtcReported = s.mUtcReported;
+    } else {
         mCache.mRfAndParams.push_back(s);
         if (mCache.mRfAndParams.size() > maxRfAndParams) {
             mCache.mRfAndParams.erase(mCache.mRfAndParams.begin());
@@ -1141,7 +1096,9 @@ bool SystemStatus::setRfAndParams(const SystemStatusPQWM1& nmea)
 bool SystemStatus::setErrRecovery(const SystemStatusPQWM1& nmea)
 {
     SystemStatusErrRecovery s(nmea);
-    if (mCache.mErrRecovery.empty() || !mCache.mErrRecovery.back().equals(s)) {
+    if (!mCache.mErrRecovery.empty() && mCache.mErrRecovery.back().equals(s)) {
+        mCache.mErrRecovery.back().mUtcReported = s.mUtcReported;
+    } else {
         mCache.mErrRecovery.push_back(s);
         if (mCache.mErrRecovery.size() > maxErrRecovery) {
             mCache.mErrRecovery.erase(mCache.mErrRecovery.begin());
@@ -1156,7 +1113,9 @@ bool SystemStatus::setErrRecovery(const SystemStatusPQWM1& nmea)
 bool SystemStatus::setInjectedPosition(const SystemStatusPQWP1& nmea)
 {
     SystemStatusInjectedPosition s(nmea);
-    if (mCache.mInjectedPosition.empty() || !mCache.mInjectedPosition.back().equals(s)) {
+    if (!mCache.mInjectedPosition.empty() && mCache.mInjectedPosition.back().equals(s)) {
+        mCache.mInjectedPosition.back().mUtcReported = s.mUtcReported;
+    } else {
         mCache.mInjectedPosition.push_back(s);
         if (mCache.mInjectedPosition.size() > maxInjectedPosition) {
             mCache.mInjectedPosition.erase(mCache.mInjectedPosition.begin());
@@ -1168,7 +1127,9 @@ bool SystemStatus::setInjectedPosition(const SystemStatusPQWP1& nmea)
 bool SystemStatus::setBestPosition(const SystemStatusPQWP2& nmea)
 {
     SystemStatusBestPosition s(nmea);
-    if (mCache.mBestPosition.empty() || !mCache.mBestPosition.back().equals(s)) {
+    if (!mCache.mBestPosition.empty() && mCache.mBestPosition.back().equals(s)) {
+        mCache.mBestPosition.back().mUtcReported = s.mUtcReported;
+    } else {
         mCache.mBestPosition.push_back(s);
         if (mCache.mBestPosition.size() > maxBestPosition) {
             mCache.mBestPosition.erase(mCache.mBestPosition.begin());
@@ -1180,7 +1141,9 @@ bool SystemStatus::setBestPosition(const SystemStatusPQWP2& nmea)
 bool SystemStatus::setXtra(const SystemStatusPQWP3& nmea)
 {
     SystemStatusXtra s(nmea);
-    if (mCache.mXtra.empty() || !mCache.mXtra.back().equals(s)) {
+    if (!mCache.mXtra.empty() && mCache.mXtra.back().equals(s)) {
+        mCache.mXtra.back().mUtcReported = s.mUtcReported;
+    } else {
         mCache.mXtra.push_back(s);
         if (mCache.mXtra.size() > maxXtra) {
             mCache.mXtra.erase(mCache.mXtra.begin());
@@ -1192,7 +1155,9 @@ bool SystemStatus::setXtra(const SystemStatusPQWP3& nmea)
 bool SystemStatus::setEphemeris(const SystemStatusPQWP4& nmea)
 {
     SystemStatusEphemeris s(nmea);
-    if (mCache.mEphemeris.empty() || !mCache.mEphemeris.back().equals(s)) {
+    if (!mCache.mEphemeris.empty() && mCache.mEphemeris.back().equals(s)) {
+        mCache.mEphemeris.back().mUtcReported = s.mUtcReported;
+    } else {
         mCache.mEphemeris.push_back(s);
         if (mCache.mEphemeris.size() > maxEphemeris) {
             mCache.mEphemeris.erase(mCache.mEphemeris.begin());
@@ -1204,7 +1169,9 @@ bool SystemStatus::setEphemeris(const SystemStatusPQWP4& nmea)
 bool SystemStatus::setSvHealth(const SystemStatusPQWP5& nmea)
 {
     SystemStatusSvHealth s(nmea);
-    if (mCache.mSvHealth.empty() || !mCache.mSvHealth.back().equals(s)) {
+    if (!mCache.mSvHealth.empty() && mCache.mSvHealth.back().equals(s)) {
+        mCache.mSvHealth.back().mUtcReported = s.mUtcReported;
+    } else {
         mCache.mSvHealth.push_back(s);
         if (mCache.mSvHealth.size() > maxSvHealth) {
             mCache.mSvHealth.erase(mCache.mSvHealth.begin());
@@ -1216,7 +1183,9 @@ bool SystemStatus::setSvHealth(const SystemStatusPQWP5& nmea)
 bool SystemStatus::setPdr(const SystemStatusPQWP6& nmea)
 {
     SystemStatusPdr s(nmea);
-    if (mCache.mPdr.empty() || !mCache.mPdr.back().equals(s)) {
+    if (!mCache.mPdr.empty() && mCache.mPdr.back().equals(s)) {
+        mCache.mPdr.back().mUtcReported = s.mUtcReported;
+    } else {
         mCache.mPdr.push_back(s);
         if (mCache.mPdr.size() > maxPdr) {
             mCache.mPdr.erase(mCache.mPdr.begin());
@@ -1231,7 +1200,9 @@ bool SystemStatus::setPdr(const SystemStatusPQWP6& nmea)
 bool SystemStatus::setPositionFailure(const SystemStatusPQWS1& nmea)
 {
     SystemStatusPositionFailure s(nmea);
-    if (mCache.mPositionFailure.empty() || !mCache.mPositionFailure.back().equals(s)) {
+    if (!mCache.mPositionFailure.empty() && mCache.mPositionFailure.back().equals(s)) {
+        mCache.mPositionFailure.back().mUtcReported = s.mUtcReported;
+    } else {
         mCache.mPositionFailure.push_back(s);
         if (mCache.mPositionFailure.size() > maxPositionFailure) {
             mCache.mPositionFailure.erase(mCache.mPositionFailure.begin());
@@ -1268,8 +1239,7 @@ bool SystemStatus::setNmeaString(const char *data, uint32_t len)
     }
 
     char buf[SystemStatusNmeaBase::NMEA_MAXSIZE + 1] = { 0 };
-    strlcpy(buf, data, len);
-    LOC_LOGI("setNmeaString-0301a: len=%d str=%d nmea=%s", len, strlen(data), buf);
+    strlcpy(buf, data, sizeof(buf));
 
     pthread_mutex_lock(&mMutexSystemStatus);
 
