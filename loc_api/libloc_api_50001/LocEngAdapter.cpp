@@ -36,6 +36,7 @@
 #include <LocEngAdapter.h>
 #include "loc_eng_msg.h"
 #include "loc_log.h"
+#include <loc_nmea.h>
 
 #define CHIPSET_SERIAL_NUMBER_MAX_LEN 16
 #define USER_AGENT_MAX_LEN 512
@@ -443,7 +444,8 @@ void LocInternalAdapter::reportNmea(const char* nmea, int length)
 
 inline void LocEngAdapter::reportNmea(const char* nmea, int length)
 {
-    if (!mUlp->reportNmea(nmea, length)) {
+    if (!loc_nmea_is_debug(nmea, length) &&
+        !mUlp->reportNmea(nmea, length)) {
         //Report it to HAL
         mInternalAdapter->reportNmea(nmea, length);
     }
