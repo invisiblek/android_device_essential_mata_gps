@@ -66,6 +66,7 @@
 #define FAILURE FALSE
 
 #define XTRA1_GPSONEXTRA         "xtra1.gpsonextra.net"
+#define MSA_RECURRING_MIN_TRACKING_INTERVAL_MSEC    (120 * 1000) //120 seconds
 
 using namespace loc_core;
 
@@ -2133,21 +2134,20 @@ int loc_eng_set_position_mode(loc_eng_data_s_type &loc_eng_data,
     ENTRY_LOG_CALLFLOW();
     INIT_CHECK(loc_eng_data.adapter, return -1);
 
-    // When MSA tracking session is triggered, fallback to MSB based
-    // tracking if MSB is supported or standalone tracking
-    if (params.mode == LOC_POSITION_MODE_MS_ASSISTED) {
-        if (params.recurrence == LOC_GPS_POSITION_RECURRENCE_PERIODIC) {
-            params.mode = LOC_POSITION_MODE_MS_BASED;
-        } else if (!(ContextBase::getCarrierCapabilities() & LOC_GPS_CAPABILITY_MSA)) {
-            // MSA is not supported, default to standalone
-            params.mode = LOC_POSITION_MODE_STANDALONE;
-        }
-    }
-
-    if (params.mode == LOC_POSITION_MODE_MS_BASED &&
-            !(ContextBase::getCarrierCapabilities() & LOC_GPS_CAPABILITY_MSB)) {
-        // If MSB is not supported, default to standalone
+    // The position mode for AUTO/GSS/QCA1530 can only be standalone
+    if (!(gps_conf.CAPABILITIES & LOC_GPS_CAPABILITY_MSB) &&
+        !(gps_conf.CAPABILITIES & LOC_GPS_CAPABILITY_MSA) &&
+        (params.mode != LOC_POSITION_MODE_STANDALONE)) {
         params.mode = LOC_POSITION_MODE_STANDALONE;
+        LOC_LOGD("Position mode changed to standalone for target with AUTO/GSS/qca1530.");
+    }
+    else if ((params.mode == LOC_POSITION_MODE_MS_ASSISTED) &&
+            (params.recurrence == LOC_GPS_POSITION_RECURRENCE_PERIODIC)) {
+        // For MSA, Recurring, set the min interval to higher value so
+        // we get access to MSA mode but at a rate that is reasonable.
+        if (params.min_interval < MSA_RECURRING_MIN_TRACKING_INTERVAL_MSEC) {
+            params.min_interval = MSA_RECURRING_MIN_TRACKING_INTERVAL_MSEC;
+        }
     }
 
     if(! loc_eng_data.adapter->getUlpProxy()->sendFixMode(params))
