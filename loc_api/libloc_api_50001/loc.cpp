@@ -566,9 +566,7 @@ static void loc_delete_aiding_data(LocGpsAidingData f)
 {
     ENTRY_LOG();
 
-#ifndef TARGET_BUILD_VARIANT_USER
     loc_eng_delete_aiding_data(loc_afw_data, f);
-#endif
 
     EXIT_LOG(%s, VOID_RET);
 }
