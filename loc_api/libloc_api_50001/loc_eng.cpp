@@ -2296,6 +2296,7 @@ static int loc_eng_get_zpp_handler(loc_eng_data_s_type &loc_eng_data)
    UlpLocation location;
    LocPosTechMask tech_mask = LOC_POS_TECH_MASK_DEFAULT;
    GpsLocationExtended locationExtended;
+   memset(&location, 0, sizeof(location));
    memset(&locationExtended, 0, sizeof (GpsLocationExtended));
    locationExtended.size = sizeof(locationExtended);
 
