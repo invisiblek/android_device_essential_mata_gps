@@ -270,6 +270,9 @@ void LocInternalAdapter::setUlpProxy(UlpProxyBase* ulp) {
         virtual void proc() const {
             LOC_LOGV("%s] ulp %p adapter %p", __func__,
                      mUlp, mAdapter);
+            if (mUlp) {
+                mUlp->setCapabilities(ContextBase::getCarrierCapabilities());
+            }
             mAdapter->setUlpProxy(mUlp);
         }
     };
@@ -437,17 +440,17 @@ void LocEngAdapter::reportStatus(LocGpsStatusValue status)
 
 void LocInternalAdapter::reportNmea(const char* nmea, int length)
 {
-    if (getEvtMask() & LOC_API_ADAPTER_BIT_NMEA_1HZ_REPORT) {
-        sendMsg(new LocEngReportNmea(mLocEngAdapter->getOwner(), nmea, length));
-    }
+    sendMsg(new LocEngReportNmea(mLocEngAdapter->getOwner(), nmea, length));
 }
 
 inline void LocEngAdapter::reportNmea(const char* nmea, int length)
 {
-    if (!loc_nmea_is_debug(nmea, length) &&
-        !mUlp->reportNmea(nmea, length)) {
-        //Report it to HAL
-        mInternalAdapter->reportNmea(nmea, length);
+    if (getEvtMask() & LOC_API_ADAPTER_BIT_NMEA_1HZ_REPORT) {
+        if (loc_nmea_is_debug(nmea, length) ||
+            !mUlp->reportNmea(nmea, length)) {
+            //Report it to HAL
+            mInternalAdapter->reportNmea(nmea, length);
+        }
     }
 }
 

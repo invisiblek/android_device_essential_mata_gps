@@ -581,11 +581,9 @@ static void loc_delete_aiding_data(GpsAidingData f)
 {
     ENTRY_LOG();
 
-#ifndef TARGET_BUILD_VARIANT_USER
     if (NULL != pLocGpsInterface && NULL != pLocGpsInterface->delete_aiding_data) {
         pLocGpsInterface->delete_aiding_data(A2Q_GpsAidingData(f));
     }
-#endif
 
     EXIT_LOG(%s, VOID_RET);
 }
