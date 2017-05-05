@@ -913,6 +913,9 @@ void LocEngReportSv::proc() const {
             case LOC_GNSS_CONSTELLATION_GALILEO:
                 svUsedIdMask = gnssSvIdUsedInPosition.gal_sv_used_ids_mask;
                 break;
+            case LOC_GNSS_CONSTELLATION_QZSS:
+                svUsedIdMask = gnssSvIdUsedInPosition.qzss_sv_used_ids_mask;
+                break;
             default:
                 svUsedIdMask = 0;
                 break;
